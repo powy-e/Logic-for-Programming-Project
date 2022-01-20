@@ -62,22 +62,13 @@ ilha_alturas(ilha(_,(L_ilha,_)),Ilhas, Filtradas) :-
     ilha_alturas_aux(L_ilha, Ilhas, Filtradas, []).
 
 
-vizinhas_ordenar_helper(_, [], Ilhas_Linha, Ilhas_Linha):- writeln("TSAFJDKshfKJSDHFJKDSH").
+vizinhas_ordenar_helper(_, [], Ilhas_Linha, Ilhas_Linha).
 vizinhas_ordenar_helper(L, [ilha(N1,(L1,C1))], Ilhas_Linha, Vizinhas) :-
     L1<L,
-    %writeln("AKDHSADHJSAKD"),
-    %writeln("h").
-    %C1<C -> append(ilha(N1,(L1,C1)), Ilhas_Linha, Vizinhas);append(ilha(N1,(L1,C1)), Ilhas_Coluna, Vizinhas).
     append(ilha(N1,(L1,C1)), Ilhas_Linha, Vizinhas).
 vizinhas_ordenar_helper(_, [ilha(N1,(L1,C1))], Ilhas_Linha, Vizinhas) :-
-    %writeln("AKDHSADHJSAKD"),
-    %writeln("h").
-    %C1<C -> append(ilha(N1,(L1,C1)), Ilhas_Linha, Vizinhas);append(ilha(N1,(L1,C1)), Ilhas_Coluna, Vizinhas).
-    append(Ilhas_Linha, ilha(N1,(L1,C1)), Vizinhas).
+    append(Ilhas_Linha, [ilha(N1,(L1,C1))], Vizinhas).
 vizinhas_ordenar_helper(_, [P|R], Ilhas_Linha, Vizinhas) :-
-    writeln("HEYYYYY"),
-    writeln(P),
-    writeln(R),
     append([P], Ilhas_Linha, Pre_Vizinhas),append(Pre_Vizinhas, R, Vizinhas).
 
    
@@ -87,8 +78,6 @@ vizinhas(Ilhas, ilha(N,(L,C)), Vizinhas) :-
     include(mesma_linha(L), F_Ilhas, Ilhas_linha),
     include(mesma_coluna(C), F_Ilhas, Ilhas_coluna),
     ilha_lados(ilha(N,(L,C)),Ilhas_linha, Filtradas_Linha),
-    ilha_alturas(ilha(N,(L,C)),Ilhas_coluna, Filtradas_Coluna),writeln(" "),
+    ilha_alturas(ilha(N,(L,C)),Ilhas_coluna, Filtradas_Coluna),
     vizinhas_ordenar_helper(C, Filtradas_Coluna, Filtradas_Linha, Vizinhas).
     
-%:- Ilhas = [ilha(2,(1,3)),ilha(1,(3,1)),ilha(6,(3,3)),ilha(1,(3,5))], vizinhas(Ilhas, ilha(6, (3, 3)), Vizinhas), writeln(Vizinhas); writeln(false).
-% output: [ilha(2,(1,3)),ilha(1,(3,1)),ilha(1,(3,5)),ilha(2,(5,3))]
