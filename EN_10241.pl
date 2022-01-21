@@ -1,6 +1,7 @@
 % IDENTIFICACAO E COISA E TAL
 
-% Extrai_ilhas_Linhas(Numero da Linha, Linha, Lista de Ilhas existentes)
+% Extrai_ilhas_Linhas(Numero da Linha, Linha, Lista de Ilhas existentes)/3
+% Permite extrair as ilhas de uma linha
 extrai_ilhas_linha_aux(_, _, Ilhas, Index, L, Ilhas) :- Index > L.
 extrai_ilhas_linha_aux(N_L, Linha, Ilhas, Index, L, F_Ilhas) :- 
     nth1(Index, Linha, P),
@@ -13,8 +14,6 @@ extrai_ilhas_linha_aux(N_L, Linha, Ilhas, Index, L, F_Ilhas) :-
      extrai_ilhas_linha_aux(N_L, Linha, Ilhas, N_index, L, F_Ilhas).
 
 
-
-
 extrai_ilhas_linha(_, [], []). %REDUNDANTE???? WHO KNOWS NOT SHY NOT ME ITZY
 extrai_ilhas_linha(N_L, Linha, Ilhas) :-
     length(Linha, L), 
@@ -22,7 +21,8 @@ extrai_ilhas_linha(N_L, Linha, Ilhas) :-
 
 
 
-% Predicado ilhas(Puz, Ilhas) premite a partir de um Puzzle obter uma lista
+
+% Predicado ilhas(Puz, Ilhas)/2 premite a partir de um Puzzle obter uma lista
 % com Ilhas ordenada da esquerda p/a a direita e debaixo p/a cima
 ilhas_aux(_, Ilhas_Acc, N_Linha, Ilhas_Acc, L):- N_Linha > L.
 ilhas_aux(Puz, Ilhas_prev, N_Linha, Ilhas_Final, L):- 
@@ -45,7 +45,6 @@ mesma_ilha(L, C, ilha(_,(X,Y))) :- Y==C, X==L.
 
 ilha_lados_aux(_,[], Acc, Acc).
 ilha_lados_aux(C_ilha, [ilha(N,(L,C))|_], Lados, Acc) :- C_ilha < C, (Acc = []->[ilha(N,(L,C))]= Lados;append([Acc], [ilha(N,(L,C))] , Lados)).
-%ilha_lados_aux(C_ilha, [ilha(N1,(L1,C1))|ilha(N2,(L2,C2))], [ilha(N1,(L1,C1)) | ilha(N2,(L2,C2))], _) :- C1< C_ilha, C_ilha < C2.
 ilha_lados_aux(C_ilha, [ilha(N,(L,C))|R], Filtradas, _) :-
     C< C_ilha, ilha_lados_aux(C_ilha, R, Filtradas, ilha(N,(L,C))).
 ilha_lados(ilha(_,(_,C_ilha)),Ilhas, Filtradas) :-
@@ -55,14 +54,14 @@ ilha_lados(ilha(_,(_,C_ilha)),Ilhas, Filtradas) :-
 
 ilha_alturas_aux(_,[], Acc, Acc).
 ilha_alturas_aux(L_ilha, [ilha(N,(L,C))|_], Alturas, Acc) :- L_ilha < L, (Acc = []->[ilha(N,(L,C))]= Alturas;append([Acc], [ilha(N,(L,C))] , Alturas)).
-%ilha_alturas_aux(L_ilha, [ilha(N1,(L1,C1))|ilha(N2,(L2,C2))], [ilha(N1,(L1,C1)) | ilha(N2,(L2,C2))], _) :- L1< L_ilha, L_ilha < L2.
 ilha_alturas_aux(L_ilha, [ilha(N,(L,C))|R], Filtradas, _) :-
     L< L_ilha, ilha_alturas_aux(L_ilha, R, Filtradas, ilha(N,(L,C))).
 ilha_alturas(ilha(_,(L_ilha,_)),Ilhas, Filtradas) :-
     ilha_alturas_aux(L_ilha, Ilhas, Filtradas, []).
 
-
-vizinhas_ordenar_helper(_, [], Ilhas_Linha, Ilhas_Linha).
+vizinhas_ordenar_helper(_, [], [], []).
+vizinhas_ordenar_helper(_, [], Ilhas_Linha, Vizinhas) :- is_list(Ilhas_Linha)->  Vizinhas = Ilhas_Linha; Vizinhas = [Ilhas_Linha].
+vizinhas_ordenar_helper(_, Ilhas_Coluna, [], Vizinhas) :- is_list(Ilhas_Coluna) ->Vizinhas = Ilhas_Coluna; Vizinhas = [Ilhas_Coluna].
 vizinhas_ordenar_helper(L, [ilha(N1,(L1,C1))], Ilhas_Linha, Vizinhas) :-
     L1<L,
     append(ilha(N1,(L1,C1)), Ilhas_Linha, Vizinhas).
@@ -70,7 +69,6 @@ vizinhas_ordenar_helper(_, [ilha(N1,(L1,C1))], Ilhas_Linha, Vizinhas) :-
     append(Ilhas_Linha, [ilha(N1,(L1,C1))], Vizinhas).
 vizinhas_ordenar_helper(_, [P|R], Ilhas_Linha, Vizinhas) :-
     append([P], Ilhas_Linha, Pre_Vizinhas),append(Pre_Vizinhas, R, Vizinhas).
-
    
 
 vizinhas(Ilhas, ilha(N,(L,C)), Vizinhas) :- 
@@ -80,4 +78,21 @@ vizinhas(Ilhas, ilha(N,(L,C)), Vizinhas) :-
     ilha_lados(ilha(N,(L,C)),Ilhas_linha, Filtradas_Linha),
     ilha_alturas(ilha(N,(L,C)),Ilhas_coluna, Filtradas_Coluna),
     vizinhas_ordenar_helper(C, Filtradas_Coluna, Filtradas_Linha, Vizinhas).
-    
+
+
+% O ESTADO SOCIAL E UMA MENTIRA E DEVERA MORRER DENTRO UMA DECADA
+estado_aux(_, Estado_Acumulado, Len_Ilhas, Estado_Acumulado, Len_Ilhas).
+estado_aux(Ilhas, Estado, Index, Estado_Acumulado, Len_Ilhas):-
+    nth0(Index, Ilhas, Ilha_Selecionada),
+    vizinhas(Ilhas, Ilha_Selecionada, Vizinhas),
+    Linha = [Ilha_Selecionada, Vizinhas, []],
+    N_index is Index+1,
+    append(Estado_Acumulado, [Linha], N_Acumulado),
+    estado_aux(Ilhas, Estado, N_index, N_Acumulado, Len_Ilhas).
+
+
+estado(Ilhas, Estado) :-  
+    length(Ilhas, L), 
+    estado_aux(Ilhas, Estado, 0, [], L).
+
+:- Ilhas = [ilha(4,(1,2)),ilha(3,(1,10)),ilha(3,(2,3)),ilha(3,(2,7)),ilha(1,(2,9)),ilha(2,(3,2)),ilha(3,(4,1)),ilha(4,(4,3)),ilha(4,(4,10)),ilha(1,(5,7)),ilha(1,(6,4)),ilha(3,(7,1)),ilha(3,(8,4)),ilha(5,(8,7)),ilha(4,(8,10)),ilha(2,(10,1)),ilha(4,(10,3)),ilha(2,(10,5)),ilha(1,(10,7)),ilha(1,(10,10))], estado(Ilhas, Estado), writeln(Estado); writeln(false).  
