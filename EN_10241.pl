@@ -35,52 +35,54 @@ ilhas(Puz, Ilhas) :-
     length(Puz, L), ilhas_aux(Puz, [], 1, Ilhas, L).
 
 
-% BIZINHAS
+% VIZINHAS
 
-mesma_linha(L,ilha(_,(X,_))) :- X==L.
-mesma_coluna(C, ilha(_,(_,Y))) :- Y==C.
-mesma_ilha(L, C, ilha(_,(X,Y))) :- Y==C, X==L.
-
-
-
-ilha_lados_aux(_,[], Acc, Acc).
-ilha_lados_aux(C_ilha, [ilha(N,(L,C))|_], Lados, Acc) :- C_ilha < C, (Acc = []->[ilha(N,(L,C))]= Lados;append([Acc], [ilha(N,(L,C))] , Lados)).
-ilha_lados_aux(C_ilha, [ilha(N,(L,C))|R], Filtradas, _) :-
-    C< C_ilha, ilha_lados_aux(C_ilha, R, Filtradas, ilha(N,(L,C))).
-ilha_lados(ilha(_,(_,C_ilha)),Ilhas, Filtradas) :-
-    ilha_lados_aux(C_ilha, Ilhas, Filtradas, []).
+mesma_ilha(L, C, ilha(_,(L,C))).
+mesma_linha(L,ilha(_,(L,_))).
+mesma_coluna(C, ilha(_,(_,C))).
 
 
+escolhe_elementos_prox_horizontais(_, [], []).
+escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais) :-
+    escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais, []).
+escolhe_elementos_prox_horizontais(_, [], El_Acc, El_Acc).
+escolhe_elementos_prox_horizontais(C, [ilha(N,(L,CI))|R_Ilhas], El_horizontais, El_Acc) :-
+    C < CI, append(El_Acc, [ilha(N,(L,CI))], El_horizontais);
+    C > CI, escolhe_elementos_prox_horizontais(C, R_Ilhas, El_horizontais, [ilha(N,(L,CI))]).
 
-ilha_alturas_aux(_,[], Acc, Acc).
-ilha_alturas_aux(L_ilha, [ilha(N,(L,C))|_], Alturas, Acc) :- L_ilha < L, (Acc = []->[ilha(N,(L,C))]= Alturas;append([Acc], [ilha(N,(L,C))] , Alturas)).
-ilha_alturas_aux(L_ilha, [ilha(N,(L,C))|R], Filtradas, _) :-
-    L< L_ilha, ilha_alturas_aux(L_ilha, R, Filtradas, ilha(N,(L,C))).
-ilha_alturas(ilha(_,(L_ilha,_)),Ilhas, Filtradas) :-
-    ilha_alturas_aux(L_ilha, Ilhas, Filtradas, []).
+escolhe_elementos_prox_verticais(_, [], []).
+escolhe_elementos_prox_verticais(L, Ilhas, V_Linhas) :-
+    escolhe_elementos_prox_verticais(L, Ilhas, V_Linhas, []).
+escolhe_elementos_prox_verticais(_, [], El_Acc, El_Acc).
+escolhe_elementos_prox_verticais(L, [ilha(N,(LI,C))|R_Ilhas], V_Linhas, Linhas_Acc) :-
+    L < LI,  append(Linhas_Acc, [ilha(N,(LI,C))], V_Linhas);
+    L > LI,  escolhe_elementos_prox_verticais(L, R_Ilhas, V_Linhas, [ilha(N,(LI,C))]).
+ 
+junta_linha_coluna(Horizontais, Verticais, L, Vizinhas) :-
+    length(Verticais, 0), Vizinhas = Horizontais;
+    length(Verticais, 1),
+     Verticais = [ilha(_,(L1,_))],
+     L>L1,
+     append(Verticais, Horizontais, Vizinhas);
+    length(Verticais, 1),
+     append(Horizontais, Verticais, Vizinhas);
+    Verticais = [P|R], append([P], Horizontais, Pre), append(Pre, R, Vizinhas).
+    
+    
+vizinhas([], _,[]).
+vizinhas(Ilhas, ilha(_,(L,C)), Vizinhas) :-
+    exclude(mesma_ilha(L,C), Ilhas, F_Ilhas), %Remove o proprio elemento
+    include(mesma_linha(L), F_Ilhas, Ilhas_horizontais), 
+    include(mesma_coluna(C), F_Ilhas, Ilhas_verticais),
+    escolhe_elementos_prox_horizontais(C, Ilhas_horizontais, V_horizontais),
+    escolhe_elementos_prox_verticais(L, Ilhas_verticais, V_verticais),
+    junta_linha_coluna(V_horizontais, V_verticais, L, Vizinhas).
 
-vizinhas_ordenar_helper(_, [], [], []).
-vizinhas_ordenar_helper(_, [], Ilhas_Linha, Vizinhas) :- is_list(Ilhas_Linha)->  Vizinhas = Ilhas_Linha; Vizinhas = [Ilhas_Linha].
-vizinhas_ordenar_helper(_, Ilhas_Coluna, [], Vizinhas) :- is_list(Ilhas_Coluna) ->Vizinhas = Ilhas_Coluna; Vizinhas = [Ilhas_Coluna].
-vizinhas_ordenar_helper(L, [ilha(N1,(L1,C1))], Ilhas_Linha, Vizinhas) :-
-    L1<L,
-    append(ilha(N1,(L1,C1)), Ilhas_Linha, Vizinhas).
-vizinhas_ordenar_helper(_, [ilha(N1,(L1,C1))], Ilhas_Linha, Vizinhas) :-
-    append(Ilhas_Linha, [ilha(N1,(L1,C1))], Vizinhas).
-vizinhas_ordenar_helper(_, [P|R], Ilhas_Linha, Vizinhas) :-
-    append([P], Ilhas_Linha, Pre_Vizinhas),append(Pre_Vizinhas, R, Vizinhas).
-   
-
-vizinhas(Ilhas, ilha(N,(L,C)), Vizinhas) :- 
-    exclude(mesma_ilha(L,C), Ilhas, F_Ilhas),
-    include(mesma_linha(L), F_Ilhas, Ilhas_linha),
-    include(mesma_coluna(C), F_Ilhas, Ilhas_coluna),
-    ilha_lados(ilha(N,(L,C)),Ilhas_linha, Filtradas_Linha),
-    ilha_alturas(ilha(N,(L,C)),Ilhas_coluna, Filtradas_Coluna),
-    vizinhas_ordenar_helper(C, Filtradas_Coluna, Filtradas_Linha, Vizinhas).
 
 
-% O ESTADO SOCIAL E UMA MENTIRA E DEVERA MORRER DENTRO UMA DECADA
+%% Estado
+
+
 estado_aux(_, Estado_Acumulado, Len_Ilhas, Estado_Acumulado, Len_Ilhas).
 estado_aux(Ilhas, Estado, Index, Estado_Acumulado, Len_Ilhas):-
     nth0(Index, Ilhas, Ilha_Selecionada),
@@ -95,4 +97,38 @@ estado(Ilhas, Estado) :-
     length(Ilhas, L), 
     estado_aux(Ilhas, Estado, 0, [], L).
 
-:- Ilhas = [ilha(4,(1,2)),ilha(3,(1,10)),ilha(3,(2,3)),ilha(3,(2,7)),ilha(1,(2,9)),ilha(2,(3,2)),ilha(3,(4,1)),ilha(4,(4,3)),ilha(4,(4,10)),ilha(1,(5,7)),ilha(1,(6,4)),ilha(3,(7,1)),ilha(3,(8,4)),ilha(5,(8,7)),ilha(4,(8,10)),ilha(2,(10,1)),ilha(4,(10,3)),ilha(2,(10,5)),ilha(1,(10,7)),ilha(1,(10,10))], estado(Ilhas, Estado), writeln(Estado); writeln(false).  
+
+
+% posicoes_entre
+
+
+
+posicoes_entre((L,C1), (L,C2), Posicoes) :-
+    (C1 < C2 -> CI = C1, CF = C2;CI = C2, CF = C1),
+    C_I is CI + 1,
+    C_F is CF -1,
+    findall((L,C3), between(C_I, C_F, C3), Posicoes).
+    
+posicoes_entre((L1,C), (L2,C), Posicoes) :-
+    (L1 < L2 -> LI = L1, LF = L2;LI = L2, LF = L1),
+    L_I is LI + 1,
+    L_F is LF -1,
+    findall((L3,C), between(L_I, L_F, L3), Posicoes).
+
+
+
+%cria_ponte
+
+cria_ponte((L1,C1), (L2,C2), ponte(PosF1, PosF2)):- 
+    L1=< L2, C1=< C2, PosF1 = (L1,C1), PosF2 = (L2,C2);
+    PosF1 = (L2,C2), PosF2 = (L1,C1).
+
+
+% caminho_livre/5
+
+caminho_livre(Pos1, Pos2, _, ilha(_,(L1,C1)), ilha(_,(L2,C2))):-
+    member((L1,C1),[Pos1, Pos2]), member((L2,C2),[Pos1,Pos2]).
+caminho_livre(_, _, Posicoes, ilha(_,(L1,C1)), ilha(_,(L2,C2))):-
+    posicoes_entre((L1,C1),(L2,C2), Pos_N),
+    findall(X, (member(X, Pos_N), member(X, Posicoes)), Ocupado),
+    Ocupado = [].
