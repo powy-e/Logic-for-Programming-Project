@@ -132,3 +132,30 @@ caminho_livre(_, _, Posicoes, ilha(_,(L1,C1)), ilha(_,(L2,C2))):-
     posicoes_entre((L1,C1),(L2,C2), Pos_N),
     findall(X, (member(X, Pos_N), member(X, Posicoes)), Ocupado),
     Ocupado = [].
+
+
+
+% atualiza_vizinhas_entrada/5
+
+actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, [I,Vz, Pt], [I, N_Vz, Pt]):-
+    findall(Y, (member(Y,Vz), caminho_livre(Pos1, Pos2, Posicoes, I, Y)), N_Vz).
+    
+
+
+% actualiza_vizinhas_apos_pontes/4
+
+actualiza_vizinhas_apos_pontes([], _, _, []).
+actualiza_vizinhas_apos_pontes(Estado, Pos1, Pos2, [[I,Vz, Pt]]):-
+    length(Estado, 1),
+    posicoes_entre(Pos1,Pos2, Posicoes),
+    actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, Estado, [I,Vz, Pt]).
+actualiza_vizinhas_apos_pontes([P|R], Pos1, Pos2, NovoEstado):-
+    posicoes_entre(Pos1,Pos2, Posicoes),
+    actualiza_vizinhas_entrada(Pos1, Pos2, Posicoes, P, [I,Vz, Pt]),
+    actualiza_vizinhas_apos_pontes(R, Pos1, Pos2, Estado_seguinte),
+    append([[I,Vz, Pt]], Estado_seguinte, NovoEstado).
+    
+
+% ilhas_terminadas/2
+ilhas_terminadas(Estado, Ilhas):-
+    
