@@ -42,6 +42,7 @@ mesma_linha(L,ilha(_,(L,_))).
 mesma_coluna(C, ilha(_,(_,C))).
 
 
+%%%%%%% Exportar tudo para uma usando ..[] e uma Flag
 escolhe_elementos_prox_horizontais(_, [], []).
 escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais) :-
     escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais, []).
@@ -157,5 +158,66 @@ actualiza_vizinhas_apos_pontes([P|R], Pos1, Pos2, NovoEstado):-
     
 
 % ilhas_terminadas/2
-ilhas_terminadas(Estado, Ilhas):-
+ilhas_terminadas(Estado, Ilhas_term):-
+    findall(
+        ilha(N, (L,C)), 
+        (
+            member([ilha(N, (L,C)), _, Pontes], Estado), N\='X', length(Pontes, N)
+            ),
+         Ilhas_term).
+
+
+% 2.11 tira_ilhas_terminadas_entrada/3
+
+membro_ao_contrario(Lista, El):-
+    member(El, Lista).
     
+tira_ilhas_terminadas_entrada(Ilhas_term, [I, Vz, Pt], [I, N_Vz, Pt]) :-
+    exclude(membro_ao_contrario(Ilhas_term), Vz, N_Vz).
+
+% 2.12 tira_ilhas_terminadas/3
+tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
+    maplist(tira_ilhas_terminadas_entrada(Ilhas_term), Estado, Novo_estado).
+
+
+%2.13 Predicado marca_ilhas_terminadas_entrada/3
+
+marca_ilhas_terminadas_entrada(Ilhas_term,[ilha(N,Pos), Vz, Pt], [ilha(X,Pos), Vz, Pt]):-
+    member(ilha(N,Pos), Ilhas_term) -> X='X'; X=N.
+    
+%2.14 Predicado marca_ilhas_terminadas/3
+marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
+    maplist(marca_ilhas_terminadas_entrada(Ilhas_term), Estado, Novo_estado).
+
+
+%2.15 trata_ilhas_terminadas/2
+
+trata_ilhas_terminadas(Estado, Novo_estado):-
+    ilhas_terminadas(Estado, Ilhas_term),
+    tira_ilhas_terminadas(Estado, Ilhas_term, Meio),
+    marca_ilhas_terminadas(Meio, Ilhas_term, Novo_estado).
+
+% 2.16 junta_pontes/5
+adiciona_multiplas(Coisa, Vezes, List):-
+    length(List, Vezes), maplist(=(Coisa), List).
+
+adiciona_pontes(_, _, _, [], []).
+adiciona_pontes(Ilha1, Ilha2, Pontes, [[Ilha3,Vz, Pt]|R], Estado_Modificado):-
+    Ilha3 \= Ilha1, Ilha3 \= Ilha2,
+        adiciona_pontes(Ilha1, Ilha2, Pontes, R, Resto_Estado),
+        Estado_Modificado = [[Ilha3,Vz, Pt]|Resto_Estado];
+    append(Pt, Pontes, N_Pt),
+        adiciona_pontes(Ilha1, Ilha2, Pontes, R, Resto_Estado),
+        Estado_Modificado = [[Ilha3,Vz, N_Pt]|Resto_Estado].
+    
+    
+junta_pontes(Estado, Num_Pontes, ilha(N1,(L1,C1)), ilha(N2,(L2,C2)), Novo_Estado) :-
+    cria_ponte((L1,C1), (L2,C2), Ponte),
+    adiciona_multiplas(Ponte, Num_Pontes, Pontes),
+    adiciona_pontes(ilha(N1,(L1,C1)), ilha(N2,(L2,C2)), Pontes, Estado, Estado_Pontes),
+    actualiza_vizinhas_apos_pontes(Estado_Pontes, (L1,C1), (L2,C2), Estado_Atualizado),
+    trata_ilhas_terminadas(Estado_Atualizado, Novo_Estado).
+
+    
+
+
