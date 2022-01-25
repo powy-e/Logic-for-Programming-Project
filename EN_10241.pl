@@ -1,10 +1,13 @@
 
-%             Logica para Programacao
-%      Projeto - Solucionador de Puzzles Hashi
-%
-%             Eduardo Nazario - 102415
-%        eduardo.nazario@tecnico.ulisboa.pt
+%//////////////////////////////////////////////////////////////////////////////
 
+%                           Logica para Programacao
+%                   Projeto - Solucionador de Puzzles Hashi
+%
+%                           Eduardo Nazario - 102415
+%                      eduardo.nazario@tecnico.ulisboa.pt
+
+%//////////////////////////////////////////////////////////////////////////////
 
 %------------------------------------------------------------------------------
 
