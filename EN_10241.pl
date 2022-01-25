@@ -61,7 +61,7 @@ ilhas(Puz, Ilhas) :-
 
 % 2.3
 % Predicado vizinhas/3
-% Permite obter quais as Ilhas que são Vizinhas de uma dada ilha
+% Permite obter quais as Ilhas que sao Vizinhas de uma dada ilha
 
 
 mesma_ilha(L, C, ilha(_,(L,C))).
