@@ -76,7 +76,8 @@ escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais) :-
 escolhe_elementos_prox_horizontais(_, [], El_Acc, El_Acc).
 escolhe_elementos_prox_horizontais(C, [ilha(N,(L,CI))|R_Ilhas], El_horizontais, El_Acc) :-
     C < CI, append(El_Acc, [ilha(N,(L,CI))], El_horizontais);
-    C > CI, escolhe_elementos_prox_horizontais(C, R_Ilhas, El_horizontais, [ilha(N,(L,CI))]).
+    C > CI, 
+     escolhe_elementos_prox_horizontais(C, R_Ilhas, El_horizontais, [ilha(N,(L,CI))]).
 
 escolhe_elementos_prox_verticais(_, [], []).
 escolhe_elementos_prox_verticais(L, Ilhas, V_Linhas) :-
@@ -99,7 +100,7 @@ junta_linha_coluna(Horizontais, Verticais, L, Vizinhas) :-
 
 vizinhas([], _,[]).
 vizinhas(Ilhas, ilha(_,(L,C)), Vizinhas) :-
-    exclude(mesma_ilha(L,C), Ilhas, F_Ilhas), %Remove o proprio elemento
+    exclude(mesma_ilha(L,C), Ilhas, F_Ilhas),
     include(mesma_linha(L), F_Ilhas, Ilhas_horizontais), 
     include(mesma_coluna(C), F_Ilhas, Ilhas_verticais),
     escolhe_elementos_prox_horizontais(C, Ilhas_horizontais, V_horizontais),
