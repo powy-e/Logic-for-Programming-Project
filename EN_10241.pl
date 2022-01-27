@@ -96,6 +96,7 @@ junta_linha_coluna(Horizontais, Verticais, L, Vizinhas) :-
      Verticais = [ilha(_,(L1,_))],              % se existir uma ilha no eixo vertical,
      L>L1,                                      % se esta se encontrar em cima
      append(Verticais, Horizontais, Vizinhas);  % adiciona-a em Primeiro Lugar
+    
     length(Verticais, 1),
      append(Horizontais, Verticais, Vizinhas); %Caso contrario adiciona em Ultimo Lugar
 
