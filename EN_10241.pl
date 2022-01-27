@@ -24,12 +24,11 @@ extrai_ilhas_linha_aux(N_L, Linha, Ilhas, Index, L, F_Ilhas) :-
     append(Ilhas, [ilha(P,(N_L,Index))], Novas_ilhas),
     N_index is Index + 1, 
     extrai_ilhas_linha_aux(N_L, Linha, Novas_ilhas, N_index, L, F_Ilhas);
-    
     N_index is Index + 1, 
     extrai_ilhas_linha_aux(N_L, Linha, Ilhas, N_index, L, F_Ilhas).
 
 
-extrai_ilhas_linha(_, [], []). %REDUNDANTE???? WHO KNOWS NOT SHY NOT ME ITZY
+extrai_ilhas_linha(_, [], []).
 extrai_ilhas_linha(N_L, Linha, Ilhas) :-
     length(Linha, L), 
     extrai_ilhas_linha_aux(N_L, Linha, [], 1, L, Ilhas).
@@ -186,8 +185,8 @@ caminho_livre(_, _, Posicoes, ilha(_,(L1,C1)), ilha(_,(L2,C2))):-
 %------------------------------------------------------------------------------%
 
 % 2.8
-% Predicado atualiza_vizinhas_entrada/5
-% Permite atualizar uma entrada para que ilhas deixem de ser Vizinhas
+% Predicado actualiza_vizinhas_entrada/5
+% Permite actualizar uma entrada para que ilhas deixem de ser Vizinhas
 % tiverem o caminho obstruido por uma ponte
 
 %------------------------------------------------------------------------------%
@@ -229,90 +228,90 @@ ilhas_terminadas(Estado, Ilhas_term):-
     findall(
         ilha(N, (L,C)), 
         (
-        member([ilha(N, (L,C)), _, Pontes], Estado), N\='X', length(Pontes, N)
-        ),
+            member([ilha(N, (L,C)), _, Pontes], Estado), N\='X', length(Pontes, N)
+         ),
         Ilhas_term).
     
     
-    %------------------------------------------------------------------------------%
-    
-    % 2.11 
-    % Predicado tira_ilhas_terminadas_entrada/3
-    % Permite obter uma entrada com as ilhas terminadas removidas da lista de
-    % vizinhas de outra entrada
-    
-    %------------------------------------------------------------------------------%
-    
-    
-    membro_ao_contrario(Lista, El):-
-        member(El, Lista).
-    
-    tira_ilhas_terminadas_entrada(Ilhas_term, [I, Vz, Pt], [I, N_Vz, Pt]) :-
-        exclude(membro_ao_contrario(Ilhas_term), Vz, N_Vz).
-    
-    %------------------------------------------------------------------------------%
-    
-    % 2.12 
-    % Predicado tira_ilhas_terminadas/3
-    % Permite obter um estado em que todas as ilhas terminadas foram removidas das
-    % suas entradas
-    
-    %------------------------------------------------------------------------------%
-    
-    tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
-        maplist(tira_ilhas_terminadas_entrada(Ilhas_term), Estado, Novo_estado).
-    
-    %------------------------------------------------------------------------------%
-    
-    % 2.13 
-    % Predicado marca_ilhas_terminadas_entrada/3
-    % Permite marcar a ilha de uma entrada se esta pertencer a uma lista de ilhas
-    % terminadas, isto e substituir o seu numero de pontes por 'X'
-    
-    %------------------------------------------------------------------------------%
-    
-    marca_ilhas_terminadas_entrada(Ilhas_term,[ilha(N,Pos), Vz, Pt], [ilha(X,Pos), Vz, Pt]):-
-        member(ilha(N,Pos), Ilhas_term) -> X='X'; X=N.
-    
-    %------------------------------------------------------------------------------%
-    
-    % 2.14 
-    % Predicado marca_ilhas_terminadas/3
-    % Permite obter um estado em que todas as ilhas terminadas foram marcadas nas
-    % suas entradas
-    
-    
-    %------------------------------------------------------------------------------%
-    
-    marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
-        maplist(marca_ilhas_terminadas_entrada(Ilhas_term), Estado, Novo_estado).
-    
-    %------------------------------------------------------------------------------%
-    
-    % 2.15 
-    % Predicado trata_ilhas_terminadas/2
-    % Permite obter um estado apos a aplicacao de tira_ilhas_terminadas e
-    % marca_ilhas_terminadas a um outro estado
-    
-    %------------------------------------------------------------------------------%
-    
-    trata_ilhas_terminadas(Estado, Novo_estado):-
-        ilhas_terminadas(Estado, Ilhas_term),
-        tira_ilhas_terminadas(Estado, Ilhas_term, Meio),
-        marca_ilhas_terminadas(Meio, Ilhas_term, Novo_estado).
-    
-    %------------------------------------------------------------------------------%
-    
-    % 2.16 
-    % Predicado junta_pontes/5
-    % Permite obter o estado resultante da adicao de pontes entre duas ilhas
-    
-    %------------------------------------------------------------------------------%
-    
-    adiciona_multiplas(Coisa, Vezes, List):-
-        length(List, Vezes), maplist(=(Coisa), List).
-    
-    adiciona_pontes(_, _, _, [], []).
+%------------------------------------------------------------------------------%
+
+% 2.11 
+% Predicado tira_ilhas_terminadas_entrada/3
+% Permite obter uma entrada com as ilhas terminadas removidas da lista de
+% vizinhas de outra entrada
+
+%------------------------------------------------------------------------------%
+
+
+membro_ao_contrario(Lista, El):-
+    member(El, Lista).
+
+tira_ilhas_terminadas_entrada(Ilhas_term, [I, Vz, Pt], [I, N_Vz, Pt]) :-
+    exclude(membro_ao_contrario(Ilhas_term), Vz, N_Vz).
+
+%------------------------------------------------------------------------------%
+
+% 2.12 
+% Predicado tira_ilhas_terminadas/3
+% Permite obter um estado em que todas as ilhas terminadas foram removidas das
+% suas entradas
+
+%------------------------------------------------------------------------------%
+
+tira_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
+    maplist(tira_ilhas_terminadas_entrada(Ilhas_term), Estado, Novo_estado).
+
+%------------------------------------------------------------------------------%
+
+% 2.13 
+% Predicado marca_ilhas_terminadas_entrada/3
+% Permite marcar a ilha de uma entrada se esta pertencer a uma lista de ilhas
+% terminadas, isto e substituir o seu numero de pontes por 'X'
+
+%------------------------------------------------------------------------------%
+
+marca_ilhas_terminadas_entrada(Ilhas_term,[ilha(N,Pos), Vz, Pt], [ilha(X,Pos), Vz, Pt]):-
+    member(ilha(N,Pos), Ilhas_term) -> X='X'; X=N.
+
+%------------------------------------------------------------------------------%
+
+% 2.14 
+% Predicado marca_ilhas_terminadas/3
+% Permite obter um estado em que todas as ilhas terminadas foram marcadas nas
+% suas entradas
+
+
+%------------------------------------------------------------------------------%
+
+marca_ilhas_terminadas(Estado, Ilhas_term, Novo_estado) :-
+    maplist(marca_ilhas_terminadas_entrada(Ilhas_term), Estado, Novo_estado).
+
+%------------------------------------------------------------------------------%
+
+% 2.15 
+% Predicado trata_ilhas_terminadas/2
+% Permite obter um estado apos a aplicacao de tira_ilhas_terminadas e
+% marca_ilhas_terminadas a um outro estado
+
+%------------------------------------------------------------------------------%
+
+trata_ilhas_terminadas(Estado, Novo_estado):-
+    ilhas_terminadas(Estado, Ilhas_term),
+    tira_ilhas_terminadas(Estado, Ilhas_term, Meio),
+    marca_ilhas_terminadas(Meio, Ilhas_term, Novo_estado).
+
+%------------------------------------------------------------------------------%
+
+% 2.16 
+% Predicado junta_pontes/5
+% Permite obter o estado resultante da adicao de pontes entre duas ilhas
+
+%------------------------------------------------------------------------------%
+
+adiciona_multiplas(Coisa, Vezes, List):-
+    length(List, Vezes), maplist(=(Coisa), List).
+
+adiciona_pontes(_, _, _, [], []).
 adiciona_pontes(Ilha1, Ilha2, Pontes, [[Ilha3,Vz, Pt]|R], Estado_Modificado):-
     Ilha3 \= Ilha1, Ilha3 \= Ilha2,
     adiciona_pontes(Ilha1, Ilha2, Pontes, R, Resto_Estado),
@@ -330,4 +329,5 @@ junta_pontes(Estado, Num_Pontes, ilha(N1,POS1), ilha(N2,POS2), Novo_Estado) :-
     trata_ilhas_terminadas(Estado_Atualizado, Novo_Estado).
 
 
-%/////////////////////////       END OF FILE        ////////////////////////////%
+%//////////////////////////        END OF FILE       ////////////////////////////%
+
