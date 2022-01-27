@@ -69,7 +69,7 @@ mesma_linha(L,ilha(_,(L,_))).
 mesma_coluna(C, ilha(_,(_,C))).
 
 
-%%%%%%% Exportar tudo para uma usando ..[] e uma Flag
+% Seleciona apenas as ilhas Vizinhas no eixo horizontal
 escolhe_elementos_prox_horizontais(_, [], []).
 escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais) :-
     escolhe_elementos_prox_horizontais(C, Ilhas, El_horizontais, []).
@@ -77,8 +77,10 @@ escolhe_elementos_prox_horizontais(_, [], El_Acc, El_Acc).
 escolhe_elementos_prox_horizontais(C, [ilha(N,(L,CI))|R_Ilhas], El_horizontais, El_Acc) :-
     C < CI, append(El_Acc, [ilha(N,(L,CI))], El_horizontais);
     C > CI, 
-     escolhe_elementos_prox_horizontais(C, R_Ilhas, El_horizontais, [ilha(N,(L,CI))]).
+    escolhe_elementos_prox_horizontais(C, R_Ilhas, El_horizontais, [ilha(N,(L,CI))]).
 
+
+% Seleciona apenas as ilhas Vizinhas no eixo Vertical
 escolhe_elementos_prox_verticais(_, [], []).
 escolhe_elementos_prox_verticais(L, Ilhas, V_Linhas) :-
     escolhe_elementos_prox_verticais(L, Ilhas, V_Linhas, []).
@@ -87,22 +89,26 @@ escolhe_elementos_prox_verticais(L, [ilha(N,(LI,C))|R_Ilhas], V_Linhas, Linhas_A
     L < LI,  append(Linhas_Acc, [ilha(N,(LI,C))], V_Linhas);
     L > LI,  escolhe_elementos_prox_verticais(L, R_Ilhas, V_Linhas, [ilha(N,(LI,C))]).
 
+% Cria uma lista com as Ilhas Vizinhas Ordenadas
 junta_linha_coluna(Horizontais, Verticais, L, Vizinhas) :-
-    length(Verticais, 0), Vizinhas = Horizontais;
+    length(Verticais, 0), Vizinhas = Horizontais; 
+    length(Verticais, 1),           
+     Verticais = [ilha(_,(L1,_))],              % se existir uma ilha no eixo vertical,
+     L>L1,                                      % se esta se encontrar em cima
+     append(Verticais, Horizontais, Vizinhas);  % adiciona-a em Primeiro Lugar
     length(Verticais, 1),
-    Verticais = [ilha(_,(L1,_))],
-    L>L1,
-    append(Verticais, Horizontais, Vizinhas);
-    length(Verticais, 1),
-    append(Horizontais, Verticais, Vizinhas);
-    Verticais = [P|R], append([P], Horizontais, Pre), append(Pre, R, Vizinhas).
+     append(Horizontais, Verticais, Vizinhas); %Caso contrario adiciona em Ultimo Lugar
+
+    Verticais = [P|R],                      % Caso existam duas ilhas no eixo vertical,
+     append([P], Horizontais, Pre),         % Entao a Primeira sera o Primeiro elemento
+     append(Pre, R, Vizinhas).              % E a segunda o Ultimo elemento
 
 
 vizinhas([], _,[]).
 vizinhas(Ilhas, ilha(_,(L,C)), Vizinhas) :-
     exclude(mesma_ilha(L,C), Ilhas, F_Ilhas),
-    include(mesma_linha(L), F_Ilhas, Ilhas_horizontais), 
-    include(mesma_coluna(C), F_Ilhas, Ilhas_verticais),
+    include(mesma_linha(L), F_Ilhas, Ilhas_horizontais), % Seleciona as ilhas Horizontais
+    include(mesma_coluna(C), F_Ilhas, Ilhas_verticais),  % Seleciona as ilhas Verticais
     escolhe_elementos_prox_horizontais(C, Ilhas_horizontais, V_horizontais),
     escolhe_elementos_prox_verticais(L, Ilhas_verticais, V_verticais),
     junta_linha_coluna(V_horizontais, V_verticais, L, Vizinhas).
@@ -122,7 +128,7 @@ estado_aux(Ilhas, Estado, Index, Estado_Acumulado, Len_Ilhas):-
     nth0(Index, Ilhas, Ilha_Selecionada),
     vizinhas(Ilhas, Ilha_Selecionada, Vizinhas),
     Linha = [Ilha_Selecionada, Vizinhas, []],
-    N_index is Index+1,
+    N_index is Index + 1,
     append(Estado_Acumulado, [Linha], N_Acumulado),
     estado_aux(Ilhas, Estado, N_index, N_Acumulado, Len_Ilhas).
 
