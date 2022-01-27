@@ -92,6 +92,7 @@ escolhe_elementos_prox_verticais(L, [ilha(N,(LI,C))|R_Ilhas], V_Linhas, Linhas_A
 % Cria uma lista com as Ilhas Vizinhas Ordenadas
 junta_linha_coluna(Horizontais, Verticais, L, Vizinhas) :-
     length(Verticais, 0), Vizinhas = Horizontais; 
+    
     length(Verticais, 1),           
      Verticais = [ilha(_,(L1,_))],              % se existir uma ilha no eixo vertical,
      L>L1,                                      % se esta se encontrar em cima
