@@ -237,7 +237,9 @@ ilhas_terminadas(Estado, Ilhas_term):-
     findall(
         ilha(N, (L,C)), 
         (
-            member([ilha(N, (L,C)), _, Pontes], Estado), N\='X', length(Pontes, N)
+            member([ilha(N, (L,C)), _, Pontes], Estado),
+            N\='X', 
+            length(Pontes, N)
          ),
         Ilhas_term).
     
